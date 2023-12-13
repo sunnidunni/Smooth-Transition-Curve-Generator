@@ -1,24 +1,25 @@
 import numpy as np
 import math
 import sympy as sym
-import numpy as np
 
 pi = math.pi
-
 t = sym.Symbol('t')
 
+fx1=  20*sym.cos(t) -60
+fy1=  0.5*t-14.7
+fz1=  20-20*sym.sin(t)
 
-fx1 = 2*sym.cos(t)
-fy1 = 0.5*t
-fz1 = 2*sym.sin(t)
 
-fx2 = 1/10* t*sym.cos(t)
-fy2 = 1/15* t*sym.sin(t)+8
-fz2 = 0.5*t-7
 
-t1 = 4*pi
+fx2= -3*sym.cos(t) - 10
+fy2= 3*sym.sin(t) + 10
+fz2= 80 - 4*t
 
-t2 = 4.5*pi
+time1 = 2*pi
+time2 = 0
+
+t1 = time1
+t2 = time2
 
 fx1d1 = sym.diff(fx1)    
 fx1d2 = sym.diff(fx1d1)
@@ -127,11 +128,147 @@ def makeout(x):
                 out += "+"
     return out
 
+def round(x):
+    for i in range(len(x)):
+        if -1*10**(-10) < x[i] < 1*10**(-10):
+            x[i] = 0
+    return x
+
 xout = makeout(x)
 yout = makeout(y)
 zout = makeout(z)
 
 print("(("+xout+","+yout+","+zout+"),t,-pi,pi)")
+print("\n")
+
+
+resfx1 = x[0] + x[1]*t + x[2]*t**2 + x[3]*t**3 + x[4]*t**4 + x[5]*t**5 + x[6]*t**6 + x[7]*t**7
+resfy1 = y[0] + y[1]*t + y[2]*t**2 + y[3]*t**3 + y[4]*t**4 + y[5]*t**5 + y[6]*t**6 + y[7]*t**7
+resfz1 = z[0] + z[1]*t + z[2]*t**2 + z[3]*t**3 + z[4]*t**4 + z[5]*t**5 + z[6]*t**6 + z[7]*t**7
+
+resfx1d1 = sym.diff(resfx1)    
+resfx1d2 = sym.diff(resfx1d1)
+resfx1d3 = sym.diff(resfx1d2)
+
+resfy1d1 = sym.diff(resfy1)
+resfy1d2 = sym.diff(resfy1d1)
+resfy1d3 = sym.diff(resfy1d2)
+
+resfz1d1 = sym.diff(resfz1)
+resfz1d2 = sym.diff(resfz1d1)
+resfz1d3 = sym.diff(resfz1d2)
+
+t1 = -pi
+t2 = pi
+
+resx11 = float(resfx1.subs(t,t1))
+resx22 = float(resfx1d1.subs(t,t1))
+resx33 = float(resfx1d2.subs(t,t1))
+resx44 = float(resfx1d3.subs(t,t1))
+
+resy11 = float(resfy1.subs(t,t1))
+resy22 = float(resfy1d1.subs(t,t1))
+resy33 = float(resfy1d2.subs(t,t1))
+resy44 = float(resfy1d3.subs(t,t1))
+
+resz11 = float(resfz1.subs(t,t1))
+resz22 = float(resfz1d1.subs(t,t1))
+resz33 = float(resfz1d2.subs(t,t1))
+resz44 = float(resfz1d3.subs(t,t1))
+
+dresx11 = float(resfx1.subs(t,t2))
+dresx22 = float(resfx1d1.subs(t,t2))
+dresx33 = float(resfx1d2.subs(t,t2))
+dresx44 = float(resfx1d3.subs(t,t2))
+
+dresy11 = float(resfy1.subs(t,t2))
+dresy22 = float(resfy1d1.subs(t,t2))
+dresy33 = float(resfy1d2.subs(t,t2))
+dresy44 = float(resfy1d3.subs(t,t2))
+
+dresz11 = float(resfz1.subs(t,t2))
+dresz22 = float(resfz1d1.subs(t,t2))
+dresz33 = float(resfz1d2.subs(t,t2))
+dresz44 = float(resfz1d3.subs(t,t2))
+
+print([fx1,fy1,fz1])
+print("t1 = " + str(time1))
+print([fx2,fy2,fz2])
+print("t2 = " + str(time2))
+print("")
+
+curvature1 = np.linalg.norm(np.cross((x22,y22,z22),(x33,y33,z33))) / np.linalg.norm([x22,y22,z22])**3
+print("curve 1 curvature at t1: " + str(curvature1))
+
+rescurvature1 = np.linalg.norm(np.cross((resx22,resy22,resz22),(resx33,resy33,resz33))) / np.linalg.norm([resx22,resy22,resz22])**3
+
+print("transition curve curvature at t1: " + str(rescurvature1))
+
+curvature2 = np.linalg.norm(np.cross((x66,y66,z66),(x77,y77,z77))) / np.linalg.norm([x66,y66,z66])**3
+print("curve 2 curvature at t2: " + str(curvature2))
+
+rescurvature2 = np.linalg.norm(np.cross((dresx22,dresy22,dresz22),(dresx33,dresy33,dresz33))) / np.linalg.norm([dresx22,dresy22,dresz22])**3
+print("transition curve curvature at t2: " + str(rescurvature2))
+
+torsion1 = np.dot(np.cross([x22,y22,z22],[x33,y33,z33]),[x44,y44,z44])/ ((np.linalg.norm(np.cross([x22,y22,z22],[x33,y33,z33])))**2)
+print("curve 1 torsion at t1: " + str(torsion1))
+
+restorsion1 = np.dot(np.cross([resx22,resy22,resz22],[resx33,resy33,resz33]),[resx44,resy44,resz44])/ ((np.linalg.norm(np.cross([resx22,resy22,resz22],[resx33,resy33,resz33])))**2)
+print("transition curve torsion at t1: " + str(restorsion1))
+
+torsion2 = np.dot(np.cross([x66,y66,z66],[x77,y77,z77]),[x88,y88,z88])/ ((np.linalg.norm(np.cross([x66,y66,z66],[x77,y77,z77])))**2)
+print("curve 2 torsion at t2: " + str(torsion2))
+
+restorsion2 = np.dot(np.cross([dresx22,dresy22,dresz22],[dresx33,dresy33,dresz33]),[dresx44,dresy44,dresz44])/ ((np.linalg.norm(np.cross([dresx22,dresy22,dresz22],[dresx33,dresy33,dresz33])))**2)
+print("transition curve torsion at t2: " + str(restorsion2))
+
+print("")
+
+print("Frenet Frames: \n")
+
+T1 = round([x22,y22,z22] / np.linalg.norm([x22,y22,z22]))
+resT1 = round([resx22,resy22,resz22] / np.linalg.norm([resx22,resy22,resz22]))
+T2 = round([x66,y66,z66]/ np.linalg.norm([x66,y66,z66]))
+resT2 = round([dresx22,dresy22,dresz22] / np.linalg.norm([dresx22,dresy22,dresz22]))
+print("curve 1 unit tangent at t1: " + str(T1))
+print("transition curve unit tangent at t1: " + str(resT1))
+print("curve 2 unit tangent at t2: " + str(T2))
+print("transition curve unit tangent at t2: " + str(resT2))
+'''
+N1 = round([x33,y33,z33]/ np.linalg.norm([x33,y33,z33]))
+resN1 = round([resx33,resy33,resz33] / np.linalg.norm([resx33,resy33,resz33]))
+N2 = round([x77,y77,z77]/np.linalg.norm([x77,y77,z77]))
+resN2 = round([dresx33,dresy33,dresz33]/np.linalg.norm([dresx33,dresy33,dresz33]))
+
+
+print("curve 1 unit normal at t1: " + str(N1))
+print("transition curve unit normal at t1: " + str(resN1))
+print("curve 2 unit normal at t2: " + str(N2))
+print("transition curve unit normal at t2: " + str(resN2))
+'''
+N11 = round(np.cross([x22,y22,z22],np.cross([x33,y33,z33],[x22,y22,z22])) / (np.linalg.norm([x22,y22,z22])* np.linalg.norm(np.cross([x33,y33,z33],[x22,y22,z22]))))
+resN11 = round(np.cross([resx22,resy22,resz22],np.cross([resx33,resy33,resz33],[resx22,resy22,resz22])) / (np.linalg.norm([resx22,resy22,resz22])* np.linalg.norm(np.cross([resx33,resy33,resz33],[resx22,resy22,resz22]))))
+N22 = round(np.cross([x66,y66,z66],np.cross([x77,y77,z77],[x66,y66,z66])) / (np.linalg.norm([x66,y66,z66])* np.linalg.norm(np.cross([x77,y77,z77],[x66,y66,z66]))))
+resN22 = round(np.cross([dresx22,dresy22,dresz22],np.cross([dresx33,dresy33,dresz33],[dresx22,dresy22,dresz22])) / (np.linalg.norm([dresx22,dresy22,dresz22])* np.linalg.norm(np.cross([dresx33,dresy33,dresz33],[dresx22,dresy22,dresz22]))))
+
+print("curve 1 unit normal at t1: " + str(N11))
+print("transition curve unit normal at t1: " + str(resN11))
+print("curve 2 unit normal at t2: " + str(N22))
+print("transition curve unit normal at t2: " + str(resN22))
+
+B1 = round(np.cross(T1,N11))
+resB1 = round(np.cross(resT1,resN11))
+B2 = round(np.cross(T2,N22))
+resB2 = round(np.cross(resT2,resN22))
+print("curve 1 unit binormal at t1: " + str(B1))
+print("transition curve unit binormal at t1: " + str(resB1))
+print("curve 2 unit binormal at t2: " + str(B2))
+print("transition curve unit binormal at t2: " + str(resB2))
+                    
+            
+
+
+print("\n")
 
 
     
