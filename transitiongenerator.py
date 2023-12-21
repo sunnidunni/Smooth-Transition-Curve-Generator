@@ -5,22 +5,25 @@ import sympy as sym
 pi = math.pi
 t = sym.Symbol('t')
 
-fx1=  20*sym.cos(t) -60
-fy1=  0.5*t-14.7
-fz1=  20-20*sym.sin(t)
+#curve 1
+fx1=  sym.sin(t)
+fy1=  sym.cos(t)
+fz1=  -t+10
 
-
-
-fx2= -3*sym.cos(t) - 10
-fy2= 3*sym.sin(t) + 10
-fz2= 80 - 4*t
+#curve 2
+fx2= sym.cos(t)
+fy2= 1/2*t
+fz2= sym.sin(t)
 
 time1 = 2*pi
-time2 = 0
+
+time2 = 4*pi
+
 
 t1 = time1
 t2 = time2
 
+#calculating derivatives for first 2 curves
 fx1d1 = sym.diff(fx1)    
 fx1d2 = sym.diff(fx1d1)
 fx1d3 = sym.diff(fx1d2)
@@ -58,6 +61,7 @@ A = np.array([
     [0,0,0,6,24*pi,60*pi**2,120*pi**3,210*pi**4]
               ])
 
+#substituting time
 x11 = float(fx1.subs(t,t1))
 x22 = float(fx1d1.subs(t,t1))
 x33 = float(fx1d2.subs(t,t1))
@@ -134,6 +138,7 @@ def round(x):
             x[i] = 0
     return x
 
+#prints out formatted transfer curve equation
 xout = makeout(x)
 yout = makeout(y)
 zout = makeout(z)
@@ -141,11 +146,12 @@ zout = makeout(z)
 print("(("+xout+","+yout+","+zout+"),t,-pi,pi)")
 print("\n")
 
-
+#getting transition curve equations
 resfx1 = x[0] + x[1]*t + x[2]*t**2 + x[3]*t**3 + x[4]*t**4 + x[5]*t**5 + x[6]*t**6 + x[7]*t**7
 resfy1 = y[0] + y[1]*t + y[2]*t**2 + y[3]*t**3 + y[4]*t**4 + y[5]*t**5 + y[6]*t**6 + y[7]*t**7
 resfz1 = z[0] + z[1]*t + z[2]*t**2 + z[3]*t**3 + z[4]*t**4 + z[5]*t**5 + z[6]*t**6 + z[7]*t**7
 
+#gets derivatives of transfer curve
 resfx1d1 = sym.diff(resfx1)    
 resfx1d2 = sym.diff(resfx1d1)
 resfx1d3 = sym.diff(resfx1d2)
@@ -158,6 +164,7 @@ resfz1d1 = sym.diff(resfz1)
 resfz1d2 = sym.diff(resfz1d1)
 resfz1d3 = sym.diff(resfz1d2)
 
+#substitutes ts to transfer curve
 t1 = -pi
 t2 = pi
 
@@ -226,6 +233,7 @@ print("")
 
 print("Frenet Frames: \n")
 
+#unit tangent
 T1 = round([x22,y22,z22] / np.linalg.norm([x22,y22,z22]))
 resT1 = round([resx22,resy22,resz22] / np.linalg.norm([resx22,resy22,resz22]))
 T2 = round([x66,y66,z66]/ np.linalg.norm([x66,y66,z66]))
@@ -234,12 +242,13 @@ print("curve 1 unit tangent at t1: " + str(T1))
 print("transition curve unit tangent at t1: " + str(resT1))
 print("curve 2 unit tangent at t2: " + str(T2))
 print("transition curve unit tangent at t2: " + str(resT2))
+
+#unit normal
 '''
 N1 = round([x33,y33,z33]/ np.linalg.norm([x33,y33,z33]))
 resN1 = round([resx33,resy33,resz33] / np.linalg.norm([resx33,resy33,resz33]))
 N2 = round([x77,y77,z77]/np.linalg.norm([x77,y77,z77]))
 resN2 = round([dresx33,dresy33,dresz33]/np.linalg.norm([dresx33,dresy33,dresz33]))
-
 
 print("curve 1 unit normal at t1: " + str(N1))
 print("transition curve unit normal at t1: " + str(resN1))
@@ -266,9 +275,6 @@ print("curve 2 unit binormal at t2: " + str(B2))
 print("transition curve unit binormal at t2: " + str(resB2))
                     
             
-
-
-print("\n")
 
 
     
